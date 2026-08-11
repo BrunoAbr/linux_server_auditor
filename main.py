@@ -6,17 +6,19 @@ from auditor.processes import (
 from auditor.users import (
     get_users,
     get_login_users,
-    get_root_users
+    get_root_users,
+    get_admin_users,
+    get_system_users,
+    get_regular_users
 )
 
-def main():
-
+def auditor_summary():
     system_info = get_system_info()
-
+    
     print("=" * 40)
     print("       LINUX SERVER AUDITOR")
     print("=" * 40)
-
+    
     print(f"Hostname:          {system_info['hostname']}")
     print(f"OS:                {system_info['os']}")
     print(f"OS Version:        {system_info['os_version']}")
@@ -25,9 +27,11 @@ def main():
     print(f"Memory Usage:      {system_info['memory_usage']}%")
     print(f"Disk Usage:        {system_info['disk_usage']}%")
     print(f"Uptime:            {system_info['uptime']}")
-
+    
     print("=" * 40)
-
+    
+def cpu_processes_summary():
+    
     memory_processes = get_top_cpu_processes()
     cpu_processes = get_top_memory_processes()
 
@@ -58,33 +62,62 @@ def main():
 
     print("=" * 70)
 
-    login_users = get_login_users()
+def users_summary():
+
+    regular_users = get_regular_users()
+    system_users = get_system_users()
     root_users = get_root_users()
+    admin_users = get_admin_users()
 
     print("=" * 60)
     print("                 USER AUDIT")
     print("=" * 60)
 
-    print("\nUSERS WITH LOGIN ACCESS")
+    print("\nREGULAR USERs")
     print("-" * 60)
 
-    for user in login_users:
+    for user in regular_users:
         print(
             f"USER: {user['username']:<20}"
             f"UID {user['uid']:<8}"
             f"SHELL: {user['shell']}"
         )
 
-    print("\nUSERS WITH UID 0")
+    print("\nSYSTEM SUSERS")
     print("-" * 60)
 
-    for user in root_users:
+    for user in system_users:
         print(
             f"USER: {user['username']:<20}"
             f"UID {user['uid']}"
         )
 
     print("=" * 60)
+
+    print("\nROOT USERS")
+    print("-" * 60)
+
+    for user in root_users:
+        print(
+            f"USER: {user['username']:<20}"
+            f"UID: {user['uid']}"
+        )
+
+    print("\nADMIN USERS")
+    print("-" * 60)
+
+    for user in admin_users:
+        print(
+            f"USER: {user['username']:<20}"
+            f"GROUPS: {', '.join(user['groups'])}"
+        )
+
+    print("=" * 60)
+
+def main():
+    auditor_summary()
+    cpu_processes_summary()
+    users_summary()
 
 
 if __name__ == "__main__":
