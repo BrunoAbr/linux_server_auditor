@@ -3,8 +3,14 @@ from auditor.processes import (
     get_top_cpu_processes,
     get_top_memory_processes
 )
+from auditor.users import (
+    get_users,
+    get_login_users,
+    get_root_users
+)
 
 def main():
+
     system_info = get_system_info()
 
     print("=" * 40)
@@ -51,6 +57,35 @@ def main():
         )
 
     print("=" * 70)
+
+    login_users = get_login_users()
+    root_users = get_root_users()
+
+    print("=" * 60)
+    print("                 USER AUDIT")
+    print("=" * 60)
+
+    print("\nUSERS WITH LOGIN ACCESS")
+    print("-" * 60)
+
+    for user in login_users:
+        print(
+            f"USER: {user['username']:<20}"
+            f"UID {user['uid']:<8}"
+            f"SHELL: {user['shell']}"
+        )
+
+    print("\nUSERS WITH UID 0")
+    print("-" * 60)
+
+    for user in root_users:
+        print(
+            f"USER: {user['username']:<20}"
+            f"UID {user['uid']}"
+        )
+
+    print("=" * 60)
+
 
 if __name__ == "__main__":
     main()
