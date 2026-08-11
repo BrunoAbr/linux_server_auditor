@@ -1,4 +1,5 @@
 from pathlib import Path
+import grp
 
 def get_users():
     users = []
@@ -57,3 +58,44 @@ def get_root_users():
         for user in users
         if user["uid"] == 0
     ]
+
+def get_regular_users():
+    users = get_users()
+
+    return [
+        user
+        for user in users
+        if user["uid"] >= 1000
+    ]
+
+def get_system_users():
+    users = get_users()
+
+    return [
+        user
+        for user in users
+        if 0 < user["uid"] < 1000
+    ]
+
+def get_admin_users():
+    users = get_regular_users()
+
+    admin_users = []
+
+    admin_groups = {
+        "sudo",
+        "wheel"
+    }
+
+    for user in users:
+        groups = []
+
+        for group in grp.getgrall():
+            if user["username"] in group.gr_mem:
+                groups.append(group.gr_name)
+
+        if any(group in admin_groups for group in groups):
+            user["groups"] = groups
+            admin_users.append(user)
+
+    return admin_users
