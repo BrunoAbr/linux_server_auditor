@@ -9,7 +9,10 @@ from auditor.users import (
     get_root_users,
     get_admin_users,
     get_system_users,
-    get_regular_users
+    get_regular_users,
+    check_root_users,
+    check_system_users_shell,
+    check_admin_users
 )
 
 def auditor_summary():
@@ -114,10 +117,30 @@ def users_summary():
 
     print("=" * 60)
 
+def print_check(check):
+    status = check["status"]
+    message = check["message"]
+
+    print(f"[{status}] {message}")
+
+def user_security_summary():
+    root_check = check_root_users()
+    shell_check = check_system_users_shell()
+    admin_check = check_admin_users()
+
+    print("=" * 60)
+    print("                  USER SECURITY")
+    print("=" * 60)
+
+    print_check(root_check)
+    print_check(shell_check)
+    print_check(admin_check)
+
 def main():
     auditor_summary()
     cpu_processes_summary()
     users_summary()
+    user_security_summary()
 
 
 if __name__ == "__main__":

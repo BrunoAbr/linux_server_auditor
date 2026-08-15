@@ -98,4 +98,64 @@ def get_admin_users():
             user["groups"] = groups
             admin_users.append(user)
 
-    return admin_users
+        return admin_users
+
+def check_root_users():
+    root_users = get_root_users()
+
+    if len(root_users) == 1:
+        return {
+            "status": "OK",
+            "message": "Only one user has UID 0"
+        }
+    return {
+        "status": "CRITICAL",
+        "message": f"{len(root_users)} users have UID 0"
+    }
+
+def check_system_users_shell():
+    system_users = get_system_users()
+
+    disabled_shells = {
+        "/usr/sbin/nologin",
+        "/usr/bin/nologin",
+        "/bin/false",
+        "/usr/bin/false",
+    }
+
+    users_with_shell = []
+
+    for user in system_users:
+        if user["shell"] not in disabled_shells:
+            users_with_shell.append(user)
+
+    if not users_with_shell:
+        return {
+            "status": "OK",
+            "message": "System users have login disabled"
+        }
+    
+    return {
+        "status": "WARNING",
+        "message": (
+            f"{len(users_with_shell)} system users "
+            "have an interactiveshell"
+        ),
+        "users": users_with_shell
+    }
+
+def check_admin_users():
+    admin_users = get_admin_users()
+
+    if not admin_users:
+        return {
+            "status": "WARNING",
+            "message": "No administrative users detected"
+        }
+
+    return {
+        "status": "INFO",
+        "message": f"{len(admin_users)} administrative user(s) detected",
+        "users": admin_users
+    }
+    
